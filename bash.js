@@ -1,18 +1,35 @@
-var input = process.argv.slice(2);
+var commands = require( './commands' );
 
-input.forEach( function( command ) {
-  routeCommand( command.toLowerCase() );
-} );
+// var input = process.argv.slice(2);
 
-function routeCommand( cmd ) {
-  if ( cmd === 'pwd' ) pwd();
-  if ( cmd === 'date' ) date();
+// input.forEach( function( command ) {
+//   routeCommand( command.toLowerCase() );
+// } );
+
+
+process.stdout.write( "prompt > " );
+
+process.stdin.setEncoding('utf8');
+process.stdin.on('readable', function () {
+  var chunk = process.stdin.read();
+
+  if ( chunk !== null ) {
+    var args = chunk.trim().split(' ');
+    routeCommand(args[0].toLowerCase(), args.splice(1));
+  }
+});
+
+
+function routeCommand( cmd, args ) {
+  args.unshift(done);
+  if ( commands[cmd] ) commands[cmd].apply( commands, args );
+  else {
+    process.stdout.write("prompt > ");
+  }
 }
 
-function pwd() {
-  console.log( process.env.PWD );
-}
-
-function date() {
-  console.log( new Date() );
+function done (output) {
+  console.log(output);
+  console.log(output.split('\n').length);
+  process.stdout.write("prompt > ");
 }
